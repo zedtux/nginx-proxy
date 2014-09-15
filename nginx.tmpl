@@ -5,10 +5,6 @@ server {
 	access_log /proc/self/fd/1;
 	return 503;
 	server_tokens off; # Hide the nginx version
-	{{/* Set the Nginx client_max_body_size option from environment variables */}}
-	{{ if .Env.MAX_UPLOAD_SIZE }}
-		client_max_body_size {{ .Env.MAX_UPLOAD_SIZE }};
-	{{ end }}
 }
 
 {{ range $host, $containers := groupByMulti $ "Env.VIRTUAL_HOST" "," }}
@@ -61,5 +57,9 @@ server {
 		proxy_http_version 1.1;
 		proxy_set_header Connection "";
 	}
+	{{/* Set the Nginx client_max_body_size option from environment variables */}}
+	{{ range $size, $other := groupBy $ "Env.MAX_UPLOAD_SIZE" }}
+		client_max_body_size {{ $size }};
+	{{ end }}
 }
 {{ end }}
