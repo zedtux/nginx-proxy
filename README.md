@@ -11,6 +11,8 @@ This fork is adding the following:
  - Hidding the Nginx version number (server_tokens)
  - Adding the possibility to define change the default size of uploads (client\_max\_body\_size)
 
+You can fetch the image from https://registry.hub.docker.com/u/zedtux/nginx-proxy/.
+
 ## The original features
 
 ### Usage
