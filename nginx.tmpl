@@ -38,6 +38,11 @@ upstream {{ $host }} {
 			{{ end }}
 		{{ end }}
 	{{ end }}
+	
+	{{/* Set the Nginx client_max_body_size option from environment variables */}}
+	{{ if $value.Env.MAX_UPLOAD_SIZE }}
+		client_max_body_size {{ $value.Env.MAX_UPLOAD_SIZE }};
+	{{ end }}
 {{ end }}
 }
 
