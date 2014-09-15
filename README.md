@@ -1,12 +1,23 @@
-nginx-proxy sets up a container running nginx and [docker-gen][1].  docker-gen generate reverse proxy configs for nginx and reloads nginx when containers they are started and stopped.
+nginx-proxy sets up a container running nginx and [docker-gen](https://github.com/jwilder/docker-gen).  docker-gen generate reverse proxy configs for nginx and reloads nginx when containers they are started and stopped.
 
-See [Automated Nginx Reverse Proxy for Docker][2] for why you might want to use this.
+See [Automated Nginx Reverse Proxy for Docker](http://jasonwilder.com/blog/2014/03/25/automated-nginx-reverse-proxy-for-docker/) for why you might want to use this.
+
+This fork is from [jwilder](https://github.com/jwilder).
+
+## About this fork
+
+This fork is adding the following:
+
+ - Hidding the Nginx version number (server_tokens)
+ - Adding the possibility to define change the default size of uploads (client\_max\_body\_size)
+
+## The original features
 
 ### Usage
 
 To run it:
 
-    $ docker run -d -p 80:80 -v /var/run/docker.sock:/tmp/docker.sock jwilder/nginx-proxy
+    $ docker run -d -p 80:80 -v /var/run/docker.sock:/tmp/docker.sock zedtux/nginx-proxy
 
 Then start any containers you want proxied with an env var VIRTUAL_HOST=subdomain.youdomain.com
 
@@ -17,9 +28,6 @@ Provided your DNS is setup to forward foo.bar.com to the a host running nginx-pr
 ### Multiple Ports
 
 If your container exposes multiple ports, nginx-proxy will default to the service running on port 80.  If you need to specify a different port, you can set a VIRTUAL_PORT env var to select a different one.  If your container only exposes one port and it has a VIRTUAL_HOST env var set, that port will be selected.
-
-  [1]: https://github.com/jwilder/docker-gen
-  [2]: http://jasonwilder.com/blog/2014/03/25/automated-nginx-reverse-proxy-for-docker/
 
 ### Multiple Hosts
 
