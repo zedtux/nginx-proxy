@@ -23,6 +23,8 @@ RUN chmod u+x /usr/local/bin/forego
 RUN wget https://github.com/jwilder/docker-gen/releases/download/0.3.3/docker-gen-linux-amd64-0.3.3.tar.gz
 RUN tar xvzf docker-gen-linux-amd64-0.3.3.tar.gz
 
+VOLUME ["/etc/nginx/sites-enabled/"]
+
 EXPOSE 80
 ENV DOCKER_HOST unix:///tmp/docker.sock
 
