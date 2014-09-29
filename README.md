@@ -10,6 +10,7 @@ This fork is adding the following:
 
  - Hidding the Nginx version number (server_tokens)
  - Adding the possibility to define change the default size of uploads (client\_max\_body\_size)
+ - Allow to mount a volume to `/etc/nginx/sites-enabled/` in order to check the genenrated Nginx configuration file
 
 You can fetch the image from https://registry.hub.docker.com/u/zedtux/nginx-proxy/.
 
