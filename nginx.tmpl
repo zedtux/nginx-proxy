@@ -86,6 +86,18 @@ server {
 		proxy_set_header Connection $proxy_connection;
 	}
 
+	{{ range $docker_registry, $other := groupBy $ "Env.DOCKER_REGISTRY" }}
+		location /_ping {
+			auth_basic off;
+			proxy_pass http://{{ $host }};
+		}
+
+		location /v1/_ping {
+			auth_basic off;
+			proxy_pass http://{{ $host }};
+		}
+	{{ end }}
+
 	{{/* Set the Nginx client_max_body_size option from environment variables */}}
 	{{ range $size, $other := groupBy $ "Env.MAX_UPLOAD_SIZE" }}
 		client_max_body_size {{ $size }};
