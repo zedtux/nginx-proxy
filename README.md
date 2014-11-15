@@ -13,6 +13,7 @@ This fork is adding the following:
  - Adding the possibility to define change the default size of uploads (client\_max\_body\_size)
  - Allow to mount a volume to `/etc/nginx/sites-enabled/` in order to check the genenrated Nginx configuration file
  - Adding TLS (SSL) support
+ - Basic Auth
 
 You can fetch the image from https://registry.hub.docker.com/u/zedtux/nginx-proxy/.
 
@@ -88,3 +89,32 @@ Now when you will start you application, just set the variable `SSL_FILENAME`:
     $ docker run -e VIRTUAL_HOST=my-app.domain.tld -e SSL_FILENAME=my-app username/imagename
 
 You should then be able to access https://my-app.domain.tld/.
+
+### Basic Auth
+
+Basic Auth coupled with HTTPS can be a simple way to secure the access to an URL.
+
+First of all prepare a folder where to store the .htpasswd files and generate one:
+
+    $ mkdir /etc/docker/nginx/htpasswd/
+    $ htpasswd -c /etc/docker/nginx/htpasswd/my-app.htpasswd zedtux
+    New password:
+    Re-type new password:
+    Adding password for user zedtux
+
+Run the nginx image with a volume in order to mount this folder in the nginx container:
+
+    $ docker run -d -p 80:80 -p 443:443 -v /etc/docker/nginx/htpasswd/:/etc/nginx/htpasswd/ -v /var/run/docker.sock:/tmp/docker.sock zedtux/nginx-proxy
+
+Now start your application container passing the `HTPASSWD_FILENAME` variable:
+
+    $ docker run -e VIRTUAL_HOST=my-app.domain.ltd -e HTPASSWD_FILENAME=my-app username/imagename
+
+Accessing http://my-app.domain.ltd/ should ask you for a login and password.
+
+#### Docker registry
+
+The Docker registry requires to have 2 URLs without the Basic Auth in order to work properly.
+You just have to define the variable `DOCKER_REGISTRY` in order to fix it:
+
+    $ docker run -d -e VIRTUAL_HOST=registry.domain.tld -e HTPASSWD_FILENAME=registry -e DOCKER_REGISTRY=true registry
