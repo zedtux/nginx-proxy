@@ -14,12 +14,13 @@ RUN wget -P /usr/local/bin $FOREGO_DOWNLOAD_URL && \
   wget $DOCKER_GEN_DOWNLOAD_URL && \
   tar -C /usr/local/bin -xvzf docker-gen-linux-amd64-$DOCKER_GEN_VERSION.tar.gz && \
   rm docker-gen-linux-amd64-$DOCKER_GEN_VERSION.tar.gz && \
-  sed -i 's/# server_names_hash_bucket/server_names_hash_bucket/g' /etc/nginx/nginx.conf
+  sed -i 's/# server_names_hash_bucket/server_names_hash_bucket/g' /etc/nginx/nginx.conf && \
+  mkdir /etc/nginx/ssl/
 
 # Allow to access the generated nginx configuration file
 VOLUME ["/etc/nginx/sites-enabled/"]
 # SSL certificates path
-VOLUME ["/etc/docker/nginx/ssl/"]
+VOLUME ["/etc/nginx/ssl/"]
 
 RUN mkdir /app
 WORKDIR /app

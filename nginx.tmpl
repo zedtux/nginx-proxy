@@ -58,6 +58,11 @@ upstream {{ $host }} {
 server {
 	gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript;
 
+	{{ range $ssl_filename, $other := groupBy $ "Env.SSL_FILENAME" }}
+		listen 443 ssl;
+		ssl_certificate /etc/nginx/ssl/{{ $ssl_filename }}.crt;
+		ssl_certificate_key /etc/nginx/ssl/{{ $ssl_filename }}.key;
+	{{ end }}
 	server_name {{ $host }};
 	proxy_buffering off;
 	error_log /proc/self/fd/2;
