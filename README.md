@@ -8,6 +8,7 @@ This fork is from [jwilder](https://github.com/jwilder).
 
 This fork is adding the following:
 
+ - Use the official Nginx Docker image
  - Hidding the Nginx version number (server_tokens)
  - Adding the possibility to define change the default size of uploads (client\_max\_body\_size)
  - Allow to mount a volume to `/etc/nginx/sites-enabled/` in order to check the genenrated Nginx configuration file
