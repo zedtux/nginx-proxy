@@ -69,6 +69,11 @@ server {
 	access_log /proc/self/fd/1;
 
 	location / {
+		{{ range $htpasswd_filename, $other := groupBy $ "Env.HTPASSWD_FILENAME" }}
+			auth_basic "Restricted";
+			auth_basic_user_file /etc/nginx/htpasswd/{{ $htpasswd_filename }}.htpasswd;
+		{{ end }}
+
 		proxy_pass http://{{ $host }};
 		proxy_set_header Host $http_host;
 		proxy_set_header X-Real-IP $remote_addr;
@@ -80,6 +85,7 @@ server {
 		proxy_set_header Upgrade $http_upgrade;
 		proxy_set_header Connection $proxy_connection;
 	}
+
 	{{/* Set the Nginx client_max_body_size option from environment variables */}}
 	{{ range $size, $other := groupBy $ "Env.MAX_UPLOAD_SIZE" }}
 		client_max_body_size {{ $size }};
