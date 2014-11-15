@@ -11,6 +11,7 @@ This fork is adding the following:
  - Hidding the Nginx version number (server_tokens)
  - Adding the possibility to define change the default size of uploads (client\_max\_body\_size)
  - Allow to mount a volume to `/etc/nginx/sites-enabled/` in order to check the genenrated Nginx configuration file
+ - Adding TLS (SSL) support
 
 You can fetch the image from https://registry.hub.docker.com/u/zedtux/nginx-proxy/.
 
@@ -62,3 +63,27 @@ $ docker run --volumes-from nginx \
 Finally, start your containers with `VIRTUAL_HOST` environment variables.
 
     $ docker run -e VIRTUAL_HOST=foo.bar.com  ...
+
+
+### TLS (SSL) Support
+
+In the case you have a TLS (or the SSL) certificate you can easily use it with nginx.
+
+Create a directory on your server where you will upload the `.crt` and `.key` files to be used:
+
+    $ mkdir /etc/docker/my-app/ssl/
+    $ cp ~/my-app.* /etc/docker/my-app/ssl/
+    $ ls -al /etc/docker/my-app/ssl/
+    total 4
+    -rw-r--r-- 4 root root 4096 Nov 15 18:01 my-app.crt
+    -rw-r--r-- 4 root root 4096 Nov 15 18:01 my-app.key
+
+Run the nginx image with a volume to this folder and with the port 443:
+
+    $ docker run -d -p 80:80 -p 443:443 -v /etc/docker/my-app/ssl/:/etc/nginx/ssl/ -v /var/run/docker.sock:/tmp/docker.sock zedtux/nginx-proxy
+
+Now when you will start you application, just set the variable `SSL_FILENAME`:
+
+    $ docker run -e VIRTUAL_HOST=my-app.domain.tld -e SSL_FILENAME=my-app username/imagename
+
+You should then be able to access https://my-app.domain.tld/.
