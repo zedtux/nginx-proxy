@@ -107,7 +107,7 @@ server {
 	{{/* Set the Nginx client_max_body_size option from environment variables */}}
 	{{ range $index, $value := $containers }}
 		{{ if $value.Env.MAX_UPLOAD_SIZE }}
-			client_max_body_size {{ $size }};
+			client_max_body_size {{ $value.Env.MAX_UPLOAD_SIZE }};
 		{{ end }}
 	{{ end }}
 }
