@@ -1,15 +1,15 @@
 # If we receive X-Forwarded-Proto, pass it through; otherwise, pass along the
 # scheme used to connect to this server
 map $http_x_forwarded_proto $proxy_x_forwarded_proto {
-  default $http_x_forwarded_proto;
-  ''      $scheme;
+	default $http_x_forwarded_proto;
+	''      $scheme;
 }
 
 # If we receive Upgrade, set Connection to "upgrade"; otherwise, delete any
 # Connection header that may have been passed to this server
 map $http_upgrade $proxy_connection {
-  default upgrade;
-  ''      '';
+	default upgrade;
+	''      '';
 }
 
 server {
@@ -30,17 +30,17 @@ upstream {{ $host }} {
 	{{/* If only 1 port exposed, use that */}}
 	{{ if eq $addrLen 1 }}
 		{{ with $address := index $value.Addresses 0 }}
-		   # {{$value.Name}}
-		   server {{ $address.IP }}:{{ $address.Port }};
+			# {{$value.Name}}
+			server {{ $address.IP }}:{{ $address.Port }};
 		{{ end }}
 
 	{{/* If more than one port exposed, use the one matching VIRTUAL_PORT env var */}}
 	{{ else if $value.Env.VIRTUAL_PORT }}
 		{{ range $i, $address := $value.Addresses }}
-		   {{ if eq $address.Port $value.Env.VIRTUAL_PORT }}
-		   # {{$value.Name}}
-		   server {{ $address.IP }}:{{ $address.Port }};
-		   {{ end }}
+			{{ if eq $address.Port $value.Env.VIRTUAL_PORT }}
+			# {{$value.Name}}
+			server {{ $address.IP }}:{{ $address.Port }};
+			{{ end }}
 		{{ end }}
 
 	{{/* Else default to standard web port 80 */}}
@@ -58,10 +58,12 @@ upstream {{ $host }} {
 server {
 	gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript;
 
-	{{ range $ssl_filename, $other := groupBy $ "Env.SSL_FILENAME" }}
-		listen 443 ssl;
-		ssl_certificate /etc/nginx/ssl/{{ $ssl_filename }}.crt;
-		ssl_certificate_key /etc/nginx/ssl/{{ $ssl_filename }}.key;
+	{{ range $index, $value := $containers }}
+		{{ if $value.Env.SSL_FILENAME }}
+			listen 443 ssl;
+			ssl_certificate /etc/nginx/ssl/{{ $value.Env.SSL_FILENAME }}.crt;
+			ssl_certificate_key /etc/nginx/ssl/{{ $value.Env.SSL_FILENAME }}.key;
+		{{ end }}
 	{{ end }}
 	server_name {{ $host }};
 	proxy_buffering off;
@@ -69,9 +71,11 @@ server {
 	access_log /proc/self/fd/1;
 
 	location / {
-		{{ range $htpasswd_filename, $other := groupBy $ "Env.HTPASSWD_FILENAME" }}
-			auth_basic "Restricted";
-			auth_basic_user_file /etc/nginx/htpasswd/{{ $htpasswd_filename }}.htpasswd;
+		{{ range $index, $value := $containers }}
+			{{ if $value.Env.HTPASSWD_FILENAME }}
+				auth_basic "Restricted";
+				auth_basic_user_file /etc/nginx/htpasswd/{{ $value.Env.HTPASSWD_FILENAME }}.htpasswd;
+			{{ end }}
 		{{ end }}
 
 		proxy_pass http://{{ $host }};
@@ -86,21 +90,25 @@ server {
 		proxy_set_header Connection $proxy_connection;
 	}
 
-	{{ range $docker_registry, $other := groupBy $ "Env.DOCKER_REGISTRY" }}
-		location /_ping {
-			auth_basic off;
-			proxy_pass http://{{ $host }};
-		}
+	{{ range $index, $value := $containers }}
+		{{ if $value.Env.DOCKER_REGISTRY }}
+			location /_ping {
+				auth_basic off;
+				proxy_pass http://{{ $host }};
+			}
 
-		location /v1/_ping {
-			auth_basic off;
-			proxy_pass http://{{ $host }};
-		}
+			location /v1/_ping {
+				auth_basic off;
+				proxy_pass http://{{ $host }};
+			}
+		{{ end }}
 	{{ end }}
 
 	{{/* Set the Nginx client_max_body_size option from environment variables */}}
-	{{ range $size, $other := groupBy $ "Env.MAX_UPLOAD_SIZE" }}
-		client_max_body_size {{ $size }};
+	{{ range $index, $value := $containers }}
+		{{ if $value.Env.MAX_UPLOAD_SIZE }}
+			client_max_body_size {{ $size }};
+		{{ end }}
 	{{ end }}
 }
 {{ end }}
