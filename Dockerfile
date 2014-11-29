@@ -3,7 +3,7 @@ MAINTAINER zedtux, zedtux@zedroot.org
 
 ENV DOCKER_HOST unix:///tmp/docker.sock
 ENV FOREGO_DOWNLOAD_URL https://godist.herokuapp.com/projects/ddollar/forego/releases/current/linux-amd64/forego
-ENV DOCKER_GEN_VERSION 0.3.5
+ENV DOCKER_GEN_VERSION 0.3.6
 ENV DOCKER_GEN_DOWNLOAD_URL https://github.com/jwilder/docker-gen/releases/download/$DOCKER_GEN_VERSION/docker-gen-linux-amd64-$DOCKER_GEN_VERSION.tar.gz
 
 # Foreman in Go language
