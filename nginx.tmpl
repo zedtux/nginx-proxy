@@ -106,4 +106,14 @@ server {
 		{{ end }}
 	{{ end }}
 }
+
+{{ range $container := $containers }}
+	{{ if $container.Env.SSL_REDIRECT }}
+	server {
+		server_name {{ $host }};
+        	return         301 https://$server_name$request_uri;
+	}
+        {{ end }}
+{{ end }}
+
 {{ end }}
