@@ -67,8 +67,8 @@ upstream {{ $host }} {
 }
 
 server {
-	{{ range $container := $containers }}
-		{{ if $container.Env.SSL_FILENAME }}
+	{{ range $index, $container := $containers }}
+		{{ if and ($container.Env.SSL_FILENAME) ( eq $index 0 ) }}
 			listen 443 ssl;
 			ssl_certificate /etc/nginx/ssl/{{ $container.Env.SSL_FILENAME }}.crt;
 			ssl_certificate_key /etc/nginx/ssl/{{ $container.Env.SSL_FILENAME }}.key;
@@ -107,13 +107,13 @@ server {
 	{{ end }}
 }
 
-{{ range $container := $containers }}
-	{{ if $container.Env.SSL_REDIRECT }}
+{{ range $index, $container := $containers }}
+	{{ if and ($container.Env.SSL_REDIRECT) (eq $index 0) }}
 	server {
 		server_name {{ $host }};
-        	return         301 https://$server_name$request_uri;
+		return         301 https://$server_name$request_uri;
 	}
-        {{ end }}
+	{{ end }}
 {{ end }}
 
 {{ end }}
