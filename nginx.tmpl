@@ -77,11 +77,18 @@ server {
 	server_name {{ $host }};
 
 	location / {
-		{{ range $container := $containers }}
-			{{ if $container.Env.HTPASSWD_FILENAME }}
+		{{ range $index, $container := $containers }}
+			{{ if and ( $container.Env.HTPASSWD_FILENAME ) ( eq $index 0 ) }}
 				auth_basic "Restricted";
 				auth_basic_user_file /etc/nginx/htpasswd/{{ $container.Env.HTPASSWD_FILENAME }}.htpasswd;
 			{{ end }}
+
+ 			{{ if and ($container.Env.ROOT_REDIRECT ) ( eq $index 0 ) }}
+                        if ( $request_uri = "/" ) {
+                                return 301 http://$server_name/{{ $container.Env.ROOT_REDIRECT }};
+                        }
+                        {{ end }}
+
 		{{ end }}
 
 		proxy_pass http://{{ $host }};
