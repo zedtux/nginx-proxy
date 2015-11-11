@@ -20,7 +20,7 @@ RUN apt-get update && \
   mkdir /etc/nginx/ssl/ /etc/nginx/htpasswd/
 
 # Allow to access the generated nginx configuration file
-VOLUME ["/etc/nginx/sites-enabled/"]
+VOLUME ["/etc/nginx/conf.d/"]
 # SSL certificates directory
 VOLUME ["/etc/nginx/ssl/"]
 # Basic auth htpasswd files directory
