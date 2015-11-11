@@ -19,6 +19,10 @@ RUN apt-get update && \
   sed -i 's/# server_names_hash_bucket/server_names_hash_bucket/g' /etc/nginx/nginx.conf && \
   mkdir /etc/nginx/ssl/ /etc/nginx/htpasswd/
 
+# Configure Nginx and apply fix for very long server names
+RUN echo "daemon off;" >> /etc/nginx/nginx.conf \
+ && sed -i 's/^http {/&\n    server_names_hash_bucket_size 128;/g' /etc/nginx/nginx.conf
+
 # Allow to access the generated nginx configuration file
 VOLUME ["/etc/nginx/conf.d/"]
 # SSL certificates directory
